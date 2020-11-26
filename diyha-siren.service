@@ -1,0 +1,9 @@
+[Unit]
+Description=Diyhas Clock
+After=multi-user.target
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/an/diyclock/diyclock.py
+[Install]
+WantedBy=multi-user.target
+
