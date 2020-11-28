@@ -38,8 +38,8 @@ class AliveController:
     def __init__(self, pin, interval):
         """ Initialize the ALIVE GPIO pin. """
         self.gpio = digitalio.DigitalInOut(pin)
-        self.gpio.direction = digitalio.Direction.INPUT
-        self.gpio.pull = digitalio.Pull.DOWN
+        self.gpio.direction = digitalio.Direction.OUTPUT
+        self.gpio.value = True
         self.interval = interval
         self.inactive = True
 
@@ -54,13 +54,13 @@ class AliveController:
         """ sleep and then flash the LED """
         while True:
             if self.inactive:
-                self.gpio.pull = digitalio.Pull.DOWN
+                self.gpio.value = False
                 return
             sleep(self.interval)
-            self.gpio.pull = digitalio.Pull.UP
+            self.gpio.value = True
             print("LED on")
             sleep(1.0)
-            self.gpio.pull = digitalio.Pull.DOWN
+            self.gpio.value = False
             print("LED off")
 
     def stop(self,):

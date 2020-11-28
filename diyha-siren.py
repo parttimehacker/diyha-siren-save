@@ -40,8 +40,9 @@ from pkg_classes.mqttlocationtopic import MqttLocationTopic
 
 # Constants for GPIO pins and the I2C bus for the 8x8 matrix LED
 
-ALARM_GPIO = board.D4
-ALIVE_GPIO = board.D5
+SIREN_GPIO = board.D17
+LED_GPIO = board.D27
+ALIVE_GPIO = board.D18
 ALIVE_INTERVAL = 5
 
 # Start logging and enable imported classes to log appropriately.
@@ -57,8 +58,10 @@ TOPIC = MqttLocationTopic() # Location MQTT topic
 
 # set up alarm GPIO controller
 
-ALARM = AlarmController(ALARM_GPIO) # Alarm or light controller
-ALARM.sound_alarm(False)
+SIREN = AlarmController(SIREN_GPIO) # Alarm or light controller
+SIREN.sound_alarm(False)
+LED = AlarmController(LED_GPIO) # Flashing LED beacon
+LED.sound_alarm(False)
 
 # set up alive GPIO controller
 
@@ -74,21 +77,32 @@ def system_message(client, msg):
     LOGGER.info(msg.topic+" "+msg.payload.decode('utf-8'))
     if msg.topic == 'diy/system/fire':
         if msg.payload == b'ON':
-            ALARM.sound_alarm(True)
+            SIREN.sound_alarm(True)
+            LED.sound_alarm(True)
         else:
-            ALARM.sound_alarm(False)
+            SIREN.sound_alarm(False)
+            LED.sound_alarm(False)
     elif msg.topic == 'diy/system/panic':
         if msg.payload == b'ON':
-            ALARM.sound_alarm(True)
+            SIREN.sound_alarm(True)
+            LED.sound_alarm(True)
         else:
-            ALARM.sound_alarm(False)
+            SIREN.sound_alarm(False)
+            LED.sound_alarm(False)
+    elif msg.topic == 'diy/system/test':
+        print("Topic> ", msg.topic, "Payload> ", msg.payload )
+        if msg.payload == b'ON':
+            SIREN.sound_alarm(True)
+            LED.sound_alarm(True)
+        else:
+            SIREN.sound_alarm(False)
+            LED.sound_alarm(False)
     elif msg.topic == TOPIC.get_setup():
         topic = msg.payload.decode('utf-8') + "/alive"
         TOPIC.set(topic)
     elif msg.topic == 'diy/system/who':
-        if msg.payload == "ON":
-            if not TOPIC.waiting_for_location:
-                client.publish(TOPIC.get_status(), TOPIC.get_location(), 0, True)
+        if msg.payload == "ON" and not TOPIC.waiting_for_location:
+            client.publish(TOPIC.get_status(), TOPIC.get_location(), 0, True)
 
 #pylint: disable=unused-argument
 
@@ -106,6 +120,8 @@ TOPIC_DISPATCH_DICTIONARY = {
         {"method":system_message},
     "diy/system/panic":
         {"method":system_message},
+    "diy/system/test":
+        {"method": system_message},
     "diy/system/who":
         {"method":system_message},
     TOPIC.get_setup():
@@ -126,6 +142,7 @@ def on_connect(client, userdata, flags, rc_msg):
     #pylint: disable=unused-argument
     client.subscribe("diy/system/fire", 1)
     client.subscribe("diy/system/panic", 1)
+    client.subscribe("diy/system/test", 1)
     client.subscribe("diy/system/who", 1)
     client.subscribe(TOPIC.get_setup(), 1)
 
