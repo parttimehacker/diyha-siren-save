@@ -36,15 +36,15 @@ class AlarmController:
         """ Initialize the alarm GPIO pin. """
         self.gpio = digitalio.DigitalInOut(pin)
         self.gpio.direction = digitalio.Direction.OUTPUT
-        self.gpio.value = True
+        self.gpio.value = False
 
     def sound_alarm(self, turn_on):
         """ Turn on or off power to the GPIO pin. """
         """ Pull down to activate the relay """
         if turn_on:
-            self.gpio.value = False
-        else:
             self.gpio.value = True
+        else:
+            self.gpio.value = False
 
     def reset(self, ):
         """ Turn power off to the GPIO pin. """

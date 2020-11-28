@@ -41,7 +41,6 @@ from pkg_classes.mqttlocationtopic import MqttLocationTopic
 # Constants for GPIO pins and the I2C bus for the 8x8 matrix LED
 
 SIREN_GPIO = board.D17
-LED_GPIO = board.D27
 ALIVE_GPIO = board.D18
 ALIVE_INTERVAL = 5
 
@@ -60,8 +59,6 @@ TOPIC = MqttLocationTopic() # Location MQTT topic
 
 SIREN = AlarmController(SIREN_GPIO) # Alarm or light controller
 SIREN.sound_alarm(False)
-LED = AlarmController(LED_GPIO) # Flashing LED beacon
-LED.sound_alarm(False)
 
 # set up alive GPIO controller
 
@@ -78,25 +75,19 @@ def system_message(client, msg):
     if msg.topic == 'diy/system/fire':
         if msg.payload == b'ON':
             SIREN.sound_alarm(True)
-            LED.sound_alarm(True)
         else:
             SIREN.sound_alarm(False)
-            LED.sound_alarm(False)
     elif msg.topic == 'diy/system/panic':
         if msg.payload == b'ON':
             SIREN.sound_alarm(True)
-            LED.sound_alarm(True)
         else:
             SIREN.sound_alarm(False)
-            LED.sound_alarm(False)
     elif msg.topic == 'diy/system/test':
         print("Topic> ", msg.topic, "Payload> ", msg.payload )
         if msg.payload == b'ON':
             SIREN.sound_alarm(True)
-            LED.sound_alarm(True)
         else:
             SIREN.sound_alarm(False)
-            LED.sound_alarm(False)
     elif msg.topic == TOPIC.get_setup():
         topic = msg.payload.decode('utf-8') + "/alive"
         TOPIC.set(topic)
