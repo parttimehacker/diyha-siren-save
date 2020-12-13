@@ -25,7 +25,7 @@
 
 import socket
 
-class MqttLocationTopic:
+class TopicModel:
     """ Location_topic initializer waits for MQTT broker logic to pass location and
         avoids global PEP8 issue.
     """
