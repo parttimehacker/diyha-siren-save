@@ -33,12 +33,10 @@ import paho.mqtt.client as mqtt
 
 from pkg_classes.alarmcontroller import AlarmController
 from pkg_classes.alivecontroller import AliveController
-from pkg_classes.mqttlocationtopic import MqttLocationTopic
+from pkg_classes.topicmodel import TopicModel
+from pkg_classes.whocontroller import WhoController
 
-# imported third party classes
-# imported clocks classes
-
-# Constants for GPIO pins and the I2C bus for the 8x8 matrix LED
+# Constants for GPIO pins
 
 SIREN_GPIO = board.D17
 ALIVE_GPIO = board.D18
@@ -53,7 +51,11 @@ LOGGER.info('Application started')
 
 # Location provided by MQTT broker at runtime and managed by this class.
 
-TOPIC = MqttLocationTopic() # Location MQTT topic
+TOPIC = TopicModel() # Location MQTT topic
+
+# Set up diy/system/who message handler from MQTT broker and wait for client.
+
+WHO = WhoController()
 
 # set up alarm GPIO controller
 
@@ -83,7 +85,6 @@ def system_message(client, msg):
         else:
             SIREN.sound_alarm(False)
     elif msg.topic == 'diy/system/test':
-        print("Topic> ", msg.topic, "Payload> ", msg.payload )
         if msg.payload == b'ON':
             SIREN.sound_alarm(True)
         else:
@@ -92,8 +93,10 @@ def system_message(client, msg):
         topic = msg.payload.decode('utf-8') + "/alive"
         TOPIC.set(topic)
     elif msg.topic == 'diy/system/who':
-        if msg.payload == "ON" and not TOPIC.waiting_for_location:
-            client.publish(TOPIC.get_status(), TOPIC.get_location(), 0, True)
+        if msg.payload == "ON":
+            WHO.turn_on()
+        else:
+            WHO.turn_off()
 
 #pylint: disable=unused-argument
 
@@ -154,7 +157,11 @@ if __name__ == '__main__':
     CLIENT.on_disconnect = on_disconnect
     CLIENT.on_message = on_message
 
-    # command line argument contains Mosquitto IP address.
+    # initilze the Who client for publishing.
+
+    WHO.set_client(CLIENT)
+
+    # command line argument contains Mosquitto MQTT broker IP address.
 
     parser = argparse.ArgumentParser('sensor.py parser')
     parser.add_argument('--mqtt', help='MQTT server IP address')
@@ -171,7 +178,7 @@ if __name__ == '__main__':
     while TOPIC.waiting_for_location:
         time.sleep(5.0)
 
-    # Loop forever checking for timed events every 10 seconds.
+    # Loop forever waiting for and handling MQTT messages.
 
     while True:
-        time.sleep(10.0)
+        time.sleep(5.0)
