@@ -165,7 +165,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser('sensor.py parser')
     parser.add_argument('--mqtt', help='MQTT server IP address')
+    parser.add_argument('--gpio17', help='GPIO pin for the siren')
+    parser.add_argument('--gpio18', help='GPIO pin for the alive LED')
     args = parser.parse_args()
+
+    print("gpio17> ", args.gpio17)
+    print("gpio19> ", args.gpio18)
 
     BROKER_IP = args.mqtt
     print(BROKER_IP)
