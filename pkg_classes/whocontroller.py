@@ -38,9 +38,9 @@ class WhoController:
         self.logger = logging.getLogger(__name__)
         host_name = socket.gethostname()
         self.default_who_message = host_name
-        self.status_topic = "diy/status/who"
+        self.status_topic = "diy/system/status"
         self.waiting_for_client = True
-        self.logger.info('Waiting for client initialization')
+        self.logger.info('Waiting for client initialization: '+self.default_who_message)
 
     def set_client(self, client):
         """ The location topic is typically returned by MQTT message methods
@@ -58,7 +58,7 @@ class WhoController:
 
     def turn_on(self,):
         """  Response to MQTT diy/system/who message. """
-        self.logger.info("Received diy/system/who ON")
+        self.logger.info("Received diy/system/who ON, publish> "+self.default_who_message)
         if not self.waiting_for_client:
             self.client.publish(self.status_topic, self.default_who_message, 0, True)
         else:

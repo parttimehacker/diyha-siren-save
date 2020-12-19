@@ -93,7 +93,7 @@ def system_message(client, msg):
         topic = msg.payload.decode('utf-8') + "/alive"
         TOPIC.set(topic)
     elif msg.topic == 'diy/system/who':
-        if msg.payload == "ON":
+        if msg.payload == b'ON':
             WHO.turn_on()
         else:
             WHO.turn_off()
