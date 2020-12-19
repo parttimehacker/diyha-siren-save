@@ -26,26 +26,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import digitalio
-
+import RPi.GPIO as GPIO
 
 class AlarmController:
     """ Abstract and manage an alarm GPIO pin. """
 
     def __init__(self, pin):
         """ Initialize the alarm GPIO pin. """
-        self.gpio = digitalio.DigitalInOut(pin)
-        self.gpio.direction = digitalio.Direction.OUTPUT
-        self.gpio.value = False
+        self.alarm_pin = pin
+        GPIO.setmode(GPIO.BCM)  # Broadcom pin-numbering scheme
+        GPIO.setup(self.alarm_pin, GPIO.OUT)  # LED pin set as output
+        GPIO.output(self.alarm_pin, GPIO.LOW)
 
     def sound_alarm(self, turn_on):
         """ Turn on or off power to the GPIO pin. """
         """ Pull down to activate the relay """
         if turn_on:
-            self.gpio.value = True
+            GPIO.output(self.alarm_pin, GPIO.HIGH)
         else:
-            self.gpio.value = False
+            GPIO.output(self.alarm_pin, GPIO.LOW)
 
     def reset(self, ):
         """ Turn power off to the GPIO pin. """
-        self.gpio.value = True
+        GPIO.output(self.alarm_pin, GPIO.LOW)

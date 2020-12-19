@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@sftp://an@192.168.1.41:22/usr/bin/python3">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$/../../PyCharmProject/diyha-siren" remote-root="/home/an/diyha-siren" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>

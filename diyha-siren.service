@@ -1,9 +1,9 @@
 [Unit]
-Description=Diyhas Clock
+Description=Do It Yourself Home Automation Siren
 After=multi-user.target
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/an/diyha-siren/diyha-siren.py --mqtt chuck
+ExecStart=/usr/bin/python3 /usr/local/diyha-siren/diyha-siren.py --mqtt chuck
 [Install]
 WantedBy=multi-user.target
 

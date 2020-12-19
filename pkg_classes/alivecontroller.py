@@ -28,18 +28,16 @@
 
 from threading import Thread
 from time import sleep
-
-import digitalio
-
+import RPi.GPIO as GPIO
 
 class AliveController:
     """ Abstract and manage an alive GPIO LED. """
 
-    def __init__(self, pin, interval):
+    def __init__(self, pin=18, interval=5):
         """ Initialize the ALIVE GPIO pin. """
-        self.gpio = digitalio.DigitalInOut(pin)
-        self.gpio.direction = digitalio.Direction.OUTPUT
-        self.gpio.value = True
+        self.alive_pin = pin
+        GPIO.setmode(GPIO.BCM)  # Broadcom pin-numbering scheme
+        GPIO.setup(self.alive_pin, GPIO.OUT)  # LED pin set as output
         self.interval = interval
         self.inactive = True
 
@@ -54,14 +52,12 @@ class AliveController:
         """ sleep and then flash the LED """
         while True:
             if self.inactive:
-                self.gpio.value = False
+                GPIO.output(self.alive_pin, GPIO.LOW)
                 return
             sleep(self.interval)
-            self.gpio.value = True
-            print("LED on")
+            GPIO.output(self.alive_pin, GPIO.HIGH)
             sleep(1.0)
-            self.gpio.value = False
-            print("LED off")
+            GPIO.output(self.alive_pin, GPIO.LOW)
 
     def stop(self,):
         """ Turn power off to the GPIO pin. """
